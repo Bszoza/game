@@ -25,11 +25,15 @@ public class MovementPlayer : MonoBehaviour
         //czy gracz naciska a lub d albo <- lub ->
         //przyjmuje wartoœci -1, 0, 1
 
-        if (Input.GetButtonDown("Jump") && IsGrounded()) {
+        if (Input.GetButtonDown("Jump") && isTouchingMovingPlatform)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpStr*1.80f);
+        }
+        else if (Input.GetButtonDown("Jump") && IsGrounded()) {
             rb.velocity = new Vector2(rb.velocity.x, jumpStr);
         }
         //poruszam sie do gory o jumpstr
-        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f) {
+        else if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f) {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
         Flip();
@@ -47,7 +51,7 @@ public class MovementPlayer : MonoBehaviour
         }
         if (isTouchingMovingPlatform)
         {
-            rb.velocity = new Vector2((platformRB.velocity.x + horizontal*4), rb.velocity.y);
+            rb.velocity = new Vector2((platformRB.velocity.x + horizontal*4), rb.velocity.y-4);
         }
         else
         {
