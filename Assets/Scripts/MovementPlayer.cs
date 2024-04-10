@@ -10,6 +10,9 @@ public class MovementPlayer : MonoBehaviour
     private bool isFacingRight = true;
     public CoinMenager coinmenager;
 
+    public bool isTouchingMovingPlatform = false;
+    public Rigidbody2D platformRB;
+
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
@@ -30,6 +33,8 @@ public class MovementPlayer : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
         Flip();
+
+
     }
     private void FixedUpdate()
     {
@@ -39,6 +44,14 @@ public class MovementPlayer : MonoBehaviour
         }
         else {
             rb.velocity = new Vector2(horizontal * speed/2, rb.velocity.y);
+        }
+        if (isTouchingMovingPlatform)
+        {
+            rb.velocity = new Vector2((platformRB.velocity.x + horizontal*4), rb.velocity.y);
+        }
+        else
+        {
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
     }//przemieszczam siê w stronê horizontal z prêdkoœci¹ po osi x, oraz z 
     //stala predkoscia na osi y
