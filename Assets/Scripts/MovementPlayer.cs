@@ -13,10 +13,23 @@ public class MovementPlayer : MonoBehaviour
     public bool isTouchingMovingPlatform = false;
     public Rigidbody2D platformRB;
 
+
+    private bool isWallSliding;
+    private float wallSlidingSpeed = 1f;
+
+    private bool isWallJumping;
+    private float wallJumpingDirection;
+    private float wallJumpingTime = 0.2f;
+    private float wallJumpingCounter;
+    private float wallJumpingDuration = 0.4f;
+    private Vector2 wallJumpingPower = new Vector2(8f, 16f);
+
+
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
-
+    [SerializeField] private Transform wallCheck;
+    [SerializeField] private LayerMask wallLayer;
 
     void Update()
     {
@@ -36,12 +49,22 @@ public class MovementPlayer : MonoBehaviour
         else if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f) {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
-        Flip();
+        WallSlide();
+        WallJump();
 
+        if (!isWallJumping)
+        {
+            Flip();
+        }
 
     }
     private void FixedUpdate()
     {
+        if (!isWallJumping)
+        {
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+        }
+
         if (IsGrounded())
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
@@ -57,6 +80,7 @@ public class MovementPlayer : MonoBehaviour
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
+
     }//przemieszczam siê w stronê horizontal z prêdkoœci¹ po osi x, oraz z 
     //stala predkoscia na osi y
 
@@ -67,11 +91,71 @@ public class MovementPlayer : MonoBehaviour
      //radius: Promieñ okrêgu.
      //layerMask (opcjonalny): Okreœla, które warstwy fizyczne bior¹ udzia³ w wykrywaniu kolizji. 
      //Jeœli nie zostanie podana, sprawdzane s¹ wszystkie warstwy.
+
+
+
+    private bool IsWalled()
+    {
+        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+    }
+
+    private void WallSlide()
+    {
+        if (IsWalled() && !IsGrounded() && horizontal != 0f)
+        {
+            isWallSliding = true;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+    }
+
+    private void WallJump()
+    {
+        if (isWallSliding)
+        {
+            isWallJumping = false;
+            wallJumpingDirection = -transform.localScale.x;
+            wallJumpingCounter = wallJumpingTime;
+
+            CancelInvoke(nameof(StopWallJumping));
+        }
+        else
+        {
+            wallJumpingCounter -= Time.deltaTime;
+        }
+
+        if (Input.GetButtonDown("Jump") && wallJumpingCounter > 0f)
+        {
+            isWallJumping = true;
+            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, (float)(wallJumpingPower.y*0.5));
+            wallJumpingCounter = 0f;
+
+            if (transform.localScale.x != wallJumpingDirection)
+            {
+                isFacingRight = !isFacingRight;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
+            }
+
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+        }
+    }
+
+    private void StopWallJumping()
+    {
+        isWallJumping = false;
+    }
+
+
     private void Flip() {
         if (isFacingRight && horizontal<0f || !isFacingRight && horizontal>0f) {
             isFacingRight = !isFacingRight;//zmieniam wartoœc bool po obrocie
             Vector3 localScale = transform.localScale;// Pobranie aktualnej skali lokalnej obiektu
-            localScale.x = -1f;// Zmiana skali wzd³u¿ osi X na -1, co spowoduje odwrócenie obiektu wzglêdem osi Y
+            localScale.x *= -1f;// Zmiana skali wzd³u¿ osi X na -1, co spowoduje odwrócenie obiektu wzglêdem osi Y
             transform.localScale = localScale; // Ustawienie zmienionej skali lokalnej z powrotem na obiekcie
         }
     }
