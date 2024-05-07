@@ -2,28 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Killing : MonoBehaviour
+public class Trampoline : MonoBehaviour
 {
-
-    public GameObject player;
-    public GameObject respawnPoint;
-    // Start is called before the first frame update
+    public float jumpPower = 9.0f;
+    [SerializeField] Rigidbody2D rb;
+    
+    
     void Start()
     {
         
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
-
+        
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            player.transform.position = respawnPoint.transform.position;
+            rb.velocity = new Vector2(rb.velocity.x, jumpPower * 1.80f);
         }
- 
     }
 }

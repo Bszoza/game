@@ -6,6 +6,8 @@ TagManager:
   tags:
   - floor
   - Coin
+  - Respawner
+  - Trampoline
   layers:
   - Default
   - TransparentFX
