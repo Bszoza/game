@@ -7,6 +7,7 @@ public class Killing : MonoBehaviour
 
     public GameObject player;
     public GameObject respawnPoint;
+    public CoinMenager deathCount;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +24,7 @@ public class Killing : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             player.transform.position = respawnPoint.transform.position;
+            deathCount.deathCounter++;
         }
  
     }
