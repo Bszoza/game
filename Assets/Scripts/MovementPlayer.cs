@@ -34,9 +34,12 @@ public class MovementPlayer : MonoBehaviour
     void Update()
     {
         //while (!IsGrounded()) { speed = 0f; }
-        horizontal = Input.GetAxisRaw("Horizontal");//pobieram z klawiatury
-        //czy gracz naciska a lub d albo <- lub ->
-        //przyjmuje wartoœci -1, 0, 1
+        
+            horizontal = Input.GetAxisRaw("Horizontal");
+        //pobieram z klawiatury
+         //czy gracz naciska a lub d albo <- lub ->
+         //przyjmuje wartoœci -1, 0, 1
+
 
         if (Input.GetButtonDown("Jump") && isTouchingMovingPlatform)
         {
@@ -69,23 +72,25 @@ public class MovementPlayer : MonoBehaviour
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
-        else {
-            rb.velocity = new Vector2(horizontal * speed/2, rb.velocity.y);
-        }
+      //  else
+      //  {
+      //       rb.velocity = new Vector2(horizontal * speed/2, rb.velocity.y);
+      //  }
         if (isTouchingMovingPlatform)
         {
             rb.velocity = new Vector2((platformRB.velocity.x + horizontal*4), rb.velocity.y-4);
         }
-        else
+        else 
         {
-            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
-        }
+           rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+         }
+      
 
     }//przemieszczam siê w stronê horizontal z prêdkoœci¹ po osi x, oraz z 
     //stala predkoscia na osi y
 
     private bool IsGrounded() {
-        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        return Physics2D.OverlapCircle(groundCheck.position, 0.5f, groundLayer);
     }//sprawdzam czy kwadracik wlozony w postac dotyka jednostki ground
      //position: Pozycja œrodka okrêgu, którego kolizje chcesz wykryæ.
      //radius: Promieñ okrêgu.
