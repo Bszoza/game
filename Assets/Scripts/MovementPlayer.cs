@@ -8,6 +8,7 @@ public class MovementPlayer : MonoBehaviour
     private float speed = 6f;
     private float jumpStr = 9f;
     private bool isFacingRight = true;
+    private bool horizontalEnable = true;
     public CoinMenager coinmenager;
 
     public bool isTouchingMovingPlatform = false;
@@ -15,7 +16,9 @@ public class MovementPlayer : MonoBehaviour
 
 
     private bool isWallSliding;
+    private bool isSlippering;
     private float wallSlidingSpeed = 1f;
+    private float slippingSpeed = 8f;
 
     private bool isWallJumping;
     private float wallJumpingDirection;
@@ -30,12 +33,14 @@ public class MovementPlayer : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform wallCheck;
     [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private Transform slipperyCheck;
+    [SerializeField] private LayerMask slipperyLayer;
 
     void Update()
     {
         //while (!IsGrounded()) { speed = 0f; }
-        
-            horizontal = Input.GetAxisRaw("Horizontal");
+        if (horizontalEnable) { horizontal = Input.GetAxisRaw("Horizontal"); }
+            
         //pobieram z klawiatury
          //czy gracz naciska a lub d albo <- lub ->
          //przyjmuje wartoœci -1, 0, 1
@@ -44,16 +49,20 @@ public class MovementPlayer : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isTouchingMovingPlatform)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpStr*1.80f);
+            horizontalEnable = true;
         }
         else if (Input.GetButtonDown("Jump") && IsGrounded()) {
             rb.velocity = new Vector2(rb.velocity.x, jumpStr);
+            horizontalEnable = true;
         }
         //poruszam sie do gory o jumpstr
         else if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f) {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            horizontalEnable = true;
         }
         WallSlide();
         WallJump();
+        SlipperySlide();
 
         if (!isWallJumping)
         {
@@ -72,6 +81,10 @@ public class MovementPlayer : MonoBehaviour
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
+        if (IsGrounded() && !IsSlippery())
+        {
+            horizontalEnable = true;
+        }
       //  else
       //  {
       //       rb.velocity = new Vector2(horizontal * speed/2, rb.velocity.y);
@@ -84,6 +97,10 @@ public class MovementPlayer : MonoBehaviour
         {
            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
          }
+
+        if (isSlippering) {
+            SlipperySlide();
+        }
       
 
     }//przemieszczam siê w stronê horizontal z prêdkoœci¹ po osi x, oraz z 
@@ -173,4 +190,28 @@ public class MovementPlayer : MonoBehaviour
         }
 
     }
+
+    private bool IsSlippery() {
+        return Physics2D.OverlapCircle(slipperyCheck.position, 0.5f, slipperyLayer);
+    }
+    private void SlipperySlide()
+    {
+
+        if (IsSlippery())
+        {
+            horizontalEnable = false;
+            isSlippering = true;
+            if (isFacingRight)
+            { rb.velocity = new Vector2((slippingSpeed), rb.velocity.y); }
+            else if (!isFacingRight)
+            { rb.velocity = new Vector2(-(slippingSpeed), rb.velocity.y); }
+
+        }
+        else
+        {
+            isSlippering = false;
+        }
+    }
+
+    // Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue
 }
