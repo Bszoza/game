@@ -6,11 +6,12 @@ public class OnOff : MonoBehaviour
 {
     public Rigidbody2D rb;
     public SpriteRenderer sp;
-    public float targetTime = 3.0f;
+    public float timer= 3.0f;
+    float targetTime;
     // Start is called before the first frame update
     void Start()
     {
-        
+        targetTime = timer;
     }
 
     // Update is called once per frame
@@ -22,7 +23,7 @@ public class OnOff : MonoBehaviour
         {
             timerEnded();
         }
-        if (targetTime <= -3.0f) {
+        if (targetTime <= -timer) {
             timerStart();
         }
 
@@ -35,7 +36,7 @@ public class OnOff : MonoBehaviour
     void timerStart() {
         rb.simulated = true;
         sp.enabled = true;
-        targetTime = 3.0f;
+        targetTime = timer;
     }
 
 }
